@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Capturar Geolocalização</title>
+</head>
+
+<body>
+  <h2>Minha Geolocalização</h2>
+  <button id="btnLocalizacao">Pegar Localização</button>
+
+  <p id="status"></p>
+
+  <script>
+    document.getElementById("btnLocalizacao").addEventListener("click", () => {
+      if (navigator.geolocation) {
+        document.getElementById("status").innerText =
+          "Solicitando permissão para acessar sua localização...";
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => console.log("Latitude:", pos.coords.latitude, "Longitude:", pos.coords.longitude),
+            (err) => console.error(err),
+          sucesso,
+          erro,
+          { enableHighAccuracy: true, timeout: 10000 } // opções
+        );
+      } else {
+        document.getElementById("status").innerText =
+          "Seu navegador não suporta geolocalização.";
+      }
+    });
+
+    function sucesso(pos) {
+      let lat = pos.coords.latitude;
+      let lon = pos.coords.longitude;
+
+      document.getElementById("status").innerText =
+        "✅ Localização obtida!\nLatitude: " + lat + " | Longitude: " + lon;
+
+      // Enviar para o backend em PHP
+      // fetch("salvar_localizacao.php", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      //   body: "latitude=" + lat + "&longitude=" + lon
+      // })
+        // .then(response => response.text())
+        // .then(data => console.log("Servidor:", data));
+    }
+
+    function erro(error) {
+      let msg;
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          msg = "❌ Você negou o acesso à localização.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          msg = "⚠️ Não foi possível obter sua localização.";
+          break;
+        case error.TIMEOUT:
+          msg = "⏳ O tempo para obter a localização expirou.";
+          break;
+        default:
+          msg = "Erro desconhecido.";
+          break;
+      }
+      document.getElementById("status").innerText = msg;
+    }
+  </script>
+</body>
+
+</html>
